@@ -8,6 +8,10 @@
 # C / C++ Ignore Rules #
 ########################
 
+# OS Files
+
+.DS_Store
+
 # Prerequisites
 *.d
 
