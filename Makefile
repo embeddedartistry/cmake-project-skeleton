@@ -103,10 +103,30 @@ scan-build:
 
 .PHONY: coverage
 coverage:
-	$(Q) cmake -B $(BUILDRESULTS)/coverage -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON $(OPTIONS) $(INTERNAL_OPTIONS)
+	$(Q) cmake -B $(BUILDRESULTS)/coverage -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE_ANALYSIS=ON $(OPTIONS) $(INTERNAL_OPTIONS)
 	$(Q) ninja -C $(BUILDRESULTS)/coverage
 	$(Q) cd $(BUILDRESULTS)/coverage; ctest
 	$(Q) ninja -C $(BUILDRESULTS)/coverage coverage
+
+.PHONY: sloccount
+sloccount: $(CONFIGURED_BUILD_DEP)
+	$(Q) ninja -C $(BUILDRESULTS) sloccount
+
+.PHONY: sloccount-full
+sloccount-full: $(CONFIGURED_BUILD_DEP)
+	$(Q) ninja -C $(BUILDRESULTS) sloccount-full
+
+.PHONY: sloccount-report
+sloccount-report: $(CONFIGURED_BUILD_DEP)
+	$(Q) ninja -C $(BUILDRESULTS) sloccount-report
+
+.PHONY: sloccount-report-full
+sloccount-full-report: $(CONFIGURED_BUILD_DEP)
+	$(Q) ninja -C $(BUILDRESULTS) sloccount-report-full
+
+.PHONY: vale
+vale: $(CONFIGURED_BUILD_DEP)
+	$(Q) ninja -C $(BUILDRESULTS) vale
 
 # Runs whenever the build has not been configured successfully
 $(CONFIGURED_BUILD_DEP):
@@ -134,11 +154,11 @@ help :
 	@echo "    > OPTIONS Configuration options to pass to a build. Default empty."
 	@echo "    > LTO Enable LTO builds. Default 0. Enable with 1."
 	@echo "    > CROSS Enable a Cross-compilation build. "
-	@echo "			Pass the cross-compilation toolchain name without a path or extension.
+	@echo "			Pass the cross-compilation toolchain name without a path or extension."
 	@echo "			Example: make CROSS=cortex-m3"
 	@echo "			For supported toolchains, see cmake/toolchains/cross/"
 	@echo "    > NATIVE Use an alternate toolchain on your build machine. "
-	@echo "			Pass the toolchain name without a path or extension.
+	@echo "			Pass the toolchain name without a path or extension."
 	@echo "			Example: make CROSS=gcc-9"
 	@echo "			For supported toolchains, see cmake/toolchains/native/"
 	@echo "    > CPM_CACHE Specify the path to the CPM source cache."
@@ -172,3 +192,9 @@ help :
 	@echo "        (for build servers)"
 	@echo "    coverage: runs code coverage analysis and generates an HTML & XML reports"
 	@echo "    tidy: runs clang-tidy linter"
+	@echo "    sloccount: Run SLOCCount analysis on project."
+	@echo "    sloccount: Run SLOCCount analysis on project with detailed output."
+	@echo "    sloccount-report: Run SLOCCount analysis on project and save the results to a file."
+	@echo "    sloccount-report-full: Run SLOCCount analysis on project with detailed output"
+	@echo "        save the results to a file."
+	@echo "    vale: Run vale documentation linting."

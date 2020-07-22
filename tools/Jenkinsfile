@@ -1,0 +1,449 @@
+#!groovy
+@Library('jenkins-pipeline-lib') _
+
+pipeline
+{
+	agent any
+	environment
+	{
+		GIT_CHANGE_LOG = gitChangeLog(currentBuild.changeSets)
+	}
+	parameters
+	{
+		string(defaultValue: '0', description: 'Major version number (x.0.0)', name: 'MAJOR_VERSION')
+		string(defaultValue: '1', description: 'Minor version number (0.x.0)', name: 'MINOR_VERSION')
+	}
+	triggers
+	{
+		//At 04:00 on every day-of-week from Monday through Friday.
+		pollSCM('H 4 * * 1-5')
+	}
+	stages
+	{
+		stage('Setup')
+		{
+			steps
+			{
+				gitTagPreBuild "${params.MAJOR_VERSION}.${params.MINOR_VERSION}.${BUILD_NUMBER}"
+
+				echo 'Removing existing build results'
+				sh 'make distclean'
+			}
+		}
+		stage('Build for Clang')
+		{
+			steps
+			{
+				sh 'make'
+			}
+			post
+			{
+				always
+				{
+					recordIssues(
+						healthy: 5,
+						unhealthy: 10,
+						aggregatingResults: true,
+						referenceJobName: 'ea-nightly/cmake-project-skeleton/master',
+						sourceDirectory: 'buildresults/',
+						filters: [
+							excludeFile('subprojects/*')
+						],
+						qualityGates: [
+							// 3 new issue: unstable
+							[threshold: 3, type: 'DELTA', unstable: true],
+							// 5 new issues: failed build
+							[threshold: 5, type: 'DELTA', unstable: false],
+							// 10 total issues: unstable
+							[threshold: 10, type: 'TOTAL', unstable: true],
+							// 20 total issues: fail
+							[threshold: 20, type: 'TOTAL', unstable: false]
+						],
+						tools: [
+							clang(),
+						]
+					)
+				}
+			}
+		}
+		stage('Build for GCC-9')
+		{
+			steps
+			{
+				sh 'make NATIVE=gcc-9 BUILDRESULTS=buildresults/gcc-9'
+			}
+			post
+			{
+				always
+				{
+					recordIssues(
+						healthy: 5,
+						unhealthy: 10,
+						aggregatingResults: true,
+						referenceJobName: 'ea-nightly/cmake-project-skeleton/master',
+						sourceDirectory: 'buildresults/gcc-9',
+						filters: [
+							excludeFile('subprojects/*')
+						],
+						qualityGates: [
+							// 3 new issue: unstable
+							[threshold: 3, type: 'DELTA', unstable: true],
+							// 5 new issues: failed build
+							[threshold: 5, type: 'DELTA', unstable: false],
+							// 10 total issues: unstable
+							[threshold: 10, type: 'TOTAL', unstable: true],
+							// 20 total issues: fail
+							[threshold: 20, type: 'TOTAL', unstable: false]
+						],
+						tools: [
+							gcc(id:'gcc-9', name: 'gcc-9'),
+						]
+					)
+				}
+			}
+		}
+		stage('Build for GCC-8')
+		{
+			steps
+			{
+				sh 'make NATIVE=gcc-8 BUILDRESULTS=buildresults/gcc-8'
+			}
+			post
+			{
+				always
+				{
+					recordIssues(
+						healthy: 5,
+						unhealthy: 10,
+						aggregatingResults: true,
+						referenceJobName: 'ea-nightly/cmake-project-skeleton/master',
+						sourceDirectory: 'buildresults/gcc-8/',
+						filters: [
+							excludeFile('subprojects/*')
+						],
+						qualityGates: [
+							// 3 new issue: unstable
+							[threshold: 3, type: 'DELTA', unstable: true],
+							// 5 new issues: failed build
+							[threshold: 5, type: 'DELTA', unstable: false],
+							// 10 total issues: unstable
+							[threshold: 10, type: 'TOTAL', unstable: true],
+							// 20 total issues: fail
+							[threshold: 20, type: 'TOTAL', unstable: false]
+						],
+						tools: [
+							gcc(id: 'gcc-8', name: 'gcc-8'),
+						]
+					)
+				}
+			}
+		}
+		stage('Build for GCC-7')
+		{
+			steps
+			{
+				sh 'make NATIVE=gcc-7 BUILDRESULTS=buildresults/gcc-7'
+			}
+			post
+			{
+				always
+				{
+					recordIssues(
+						healthy: 5,
+						unhealthy: 10,
+						aggregatingResults: true,
+						referenceJobName: 'ea-nightly/cmake-project-skeleton/master',
+						sourceDirectory: 'buildresults/gcc-7',
+						filters: [
+							excludeFile('subprojects/*')
+						],
+						qualityGates: [
+							// 3 new issue: unstable
+							[threshold: 3, type: 'DELTA', unstable: true],
+							// 5 new issues: failed build
+							[threshold: 5, type: 'DELTA', unstable: false],
+							// 10 total issues: unstable
+							[threshold: 10, type: 'TOTAL', unstable: true],
+							// 20 total issues: fail
+							[threshold: 20, type: 'TOTAL', unstable: false]
+						],
+						tools: [
+							gcc(id: 'gcc-7', name: 'gcc-7'),
+						]
+					)
+				}
+			}
+		}
+		stage('Cross compile for ARM')
+		{
+			steps
+			{
+				sh 'make CROSS=cortex-m4_hardfloat BUILDRESULTS=buildresults/arm'
+			}
+			post
+			{
+				always
+				{
+					recordIssues(
+						healthy: 5,
+						unhealthy: 10,
+						aggregatingResults: true,
+						referenceJobName: 'ea-nightly/cmake-project-skeleton/master',
+						sourceDirectory: 'buildresults/arm',
+						filters: [
+							excludeFile('subprojects/*')
+						],
+						qualityGates: [
+							// 3 new issue: unstable
+							[threshold: 3, type: 'DELTA', unstable: true],
+							// 5 new issues: failed build
+							[threshold: 5, type: 'DELTA', unstable: false],
+							// 10 total issues: unstable
+							[threshold: 10, type: 'TOTAL', unstable: true],
+							// 20 total issues: fail
+							[threshold: 20, type: 'TOTAL', unstable: false]
+						],
+						tools: [
+							gcc(id: 'gcc-arm', name: 'gcc-arm'),
+						]
+					)
+				}
+			}
+		}
+		stage('Test')
+		{
+			steps
+			{
+				sh 'make test'
+			}
+			post
+			{
+				always
+				{
+					junit 'buildresults/test/*.xml'
+				}
+			}
+		}
+		stage('Complexity')
+		{
+			steps
+			{
+				sh 'make complexity'
+			}
+		}
+		stage('CppCheck')
+		{
+			steps
+			{
+				sh 'make cppcheck-xml'
+			}
+			post
+			{
+				always
+				{
+					recordIssues(
+						healthy: 5,
+						unhealthy: 10,
+						aggregatingResults: true,
+						referenceJobName: 'ea-nightly/cmake-project-skeleton/master',
+						filters: [
+							excludeFile('subprojects/*')
+						],
+						qualityGates: [
+							// 3 new issue: unstable
+							[threshold: 3, type: 'DELTA', unstable: true],
+							// 5 new issues: failed build
+							[threshold: 5, type: 'DELTA', unstable: false],
+							// 10 total issues: unstable
+							[threshold: 10, type: 'TOTAL', unstable: true],
+							// 20 total issues: fail
+							[threshold: 20, type: 'TOTAL', unstable: false]
+						],
+						tools: [
+							cppCheck(
+								pattern: 'buildresults/**/cppcheck.xml',
+							),
+						]
+					)
+				}
+			}
+		}
+		stage('Clang Tidy')
+		{
+			steps
+			{
+				sh 'make tidy'
+			}
+			post
+			{
+				always
+				{
+					recordIssues(
+						healthy: 5,
+						unhealthy: 10,
+						aggregatingResults: true,
+						referenceJobName: 'ea-nightly/cmake-project-skeleton/master',
+						filters: [
+							excludeFile('subprojects/*')
+						],
+						qualityGates: [
+							// 3 new issue: unstable
+							[threshold: 3, type: 'DELTA', unstable: true],
+							// 5 new issues: failed build
+							[threshold: 5, type: 'DELTA', unstable: false],
+							// 10 total issues: unstable
+							[threshold: 10, type: 'TOTAL', unstable: true],
+							// 20 total issues: fail
+							[threshold: 20, type: 'TOTAL', unstable: false]
+						],
+						tools: [
+							clangTidy(),
+						]
+					)
+				}
+			}
+		}
+		stage('Clang Analyzer')
+		{
+			steps
+			{
+				sh 'make scan-build'
+			}
+			post
+			{
+				always
+				{
+					recordIssues(
+						healthy: 5,
+						unhealthy: 10,
+						aggregatingResults: true,
+						referenceJobName: 'ea-nightly/project-skeleton/master',
+						filters: [
+							excludeFile('subprojects/*')
+						],
+						qualityGates: [
+							// 3 new issue: unstable
+							[threshold: 3, type: 'DELTA', unstable: true],
+							// 5 new issues: failed build
+							[threshold: 5, type: 'DELTA', unstable: false],
+							// 10 total issues: unstable
+							[threshold: 10, type: 'TOTAL', unstable: true],
+							// 20 total issues: fail
+							[threshold: 20, type: 'TOTAL', unstable: false]
+						],
+						tools: [
+							clang(id: 'scan-build', name: 'scan-build'),
+						]
+					)
+				}
+			}
+		}
+		stage('sloccount')
+		{
+			steps
+			{
+				sh 'make sloccount-report-full'
+			}
+			post
+			{
+				success
+				{
+					sloccountPublish encoding: '', ignoreBuildFailure: true, pattern: 'buildresults/sloccount_detailed.sc'
+				}
+			}
+		}
+		stage('Coverage')
+		{
+			steps
+			{
+				sh 'make coverage'
+			}
+			post
+			{
+				success
+				{
+					cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'buildresults/coverage/coverage-xml.xml', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+				}
+			}
+		}
+		stage('Lint Documentation')
+		{
+				steps
+				{
+					sh 'make vale'
+				}
+		}
+		stage('Generate Documentation')
+		{
+			steps
+			{
+				sh 'make docs'
+			}
+		}
+		stage('Generate Release')
+		{
+			steps
+			{
+				sh 'make package'
+			}
+		}
+		stage('Archive')
+		{
+			steps
+			{
+				dir('buildresults/releases')
+				{
+					archiveArtifacts '*.tgz'
+				}
+			}
+		}
+	}
+	post
+	{
+		always
+		{
+			// Scan for open tasks, warnings, issues, etc.
+			recordIssues(
+				healthy: 5,
+				unhealthy: 10,
+				aggregatingResults: true,
+				referenceJobName: 'ea-nightly/cmake-project-skeleton/master',
+				qualityGates: [
+					// 3 new issue: unstable
+					[threshold: 3, type: 'DELTA', unstable: true],
+					// 5 new issues: failed build
+					[threshold: 5, type: 'DELTA', unstable: false],
+					// 10 total issues: unstable
+					[threshold: 10, type: 'TOTAL', unstable: true],
+					// 20 total issues: fail
+					[threshold: 20, type: 'TOTAL', unstable: false]
+				],
+				tools: [
+					taskScanner(
+						excludePattern: 'buildresults/**, cmake/**',
+						includePattern: '**/*.c, **/*.cpp, **/*.h, **/*.hpp, **/*.sh, **/*.build',
+						normalTags: 'TODO, to do, WIP',
+						highTags: 'FIXME, FIX',
+						ignoreCase: true,
+					),
+				]
+			)
+
+			gitTagCleanup "${params.MAJOR_VERSION}.${params.MINOR_VERSION}.${BUILD_NUMBER}"
+		}
+		success
+		{
+			gitTagSuccess "${params.MAJOR_VERSION}.${params.MINOR_VERSION}.${BUILD_NUMBER}"
+		}
+		failure
+		{
+			/*
+			* This job does not have a GitHub configuration,
+			* so we need to create a dummy config
+			*/
+			githubSetConfig('69e4682e-2951-492f-b828-da06364c322d')
+			githubFileIssue()
+			emailNotify(currentBuild.currentResult)
+		}
+	}
+}

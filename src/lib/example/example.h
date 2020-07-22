@@ -3,4 +3,4 @@
 
 int ret42(void);
 
-#endif //EXAMPLE_H_
+#endif // EXAMPLE_H_

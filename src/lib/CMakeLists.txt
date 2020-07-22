@@ -17,7 +17,6 @@ function(add_library target)
 	_add_library(${target} ${ARGN})
 	# Ensure this directory is included as an interface include
 	target_include_directories(${target} INTERFACE ${LIBRARY_ROOT_DIR})
-	message("This is called for ${target} with dir: ${LIBRARY_ROOT_DIR}")
 endfunction()
 
 #############

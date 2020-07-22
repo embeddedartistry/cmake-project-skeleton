@@ -16,14 +16,13 @@
 static void test_case(__attribute__((unused)) void** state)
 {
 	// Full Assert macro reference: https://api.cmocka.org/group__cmocka__asserts.html
-	//assert_int_equal();
-	//assert_ptr_equal();
-	//assert_true();
-	//assert_false();
-	//assert_null();
-	//assert_memory_equal();
-	//assert_in_range();
-
+	// assert_int_equal();
+	// assert_ptr_equal();
+	// assert_true();
+	// assert_false();
+	// assert_null();
+	// assert_memory_equal();
+	// assert_in_range();
 }
 
 #pragma mark - Public Functions -

@@ -1,6 +1,6 @@
-###################
-# Packaging Rules #
-###################
+####################
+# Packaging Module #
+####################
 
 ### General Configuration ###
 
