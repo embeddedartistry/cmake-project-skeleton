@@ -12,6 +12,9 @@ endif
 BUILDRESULTS ?= buildresults
 CONFIGURED_BUILD_DEP = $(BUILDRESULTS)/build.ninja
 
+# This skeleton is built for CMake's Ninja generator
+export CMAKE_GENERATOR=Ninja
+
 OPTIONS ?=
 INTERNAL_OPTIONS =
 
