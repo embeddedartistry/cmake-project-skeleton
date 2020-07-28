@@ -117,11 +117,5 @@ if("${BUILD_SHARED_LIBS}" STREQUAL "")
   )
 endif()
 
-set(default_compile_commands ON)
-if("${CMAKE_EXPORT_COMPILE_COMMANDS}" STREQUAL "")
-  message(STATUS "Setting 'export compile commands' to '${default_compile_commands}' as no value was specified.")
-  set(CMAKE_EXPORT_COMPILE_COMMANDS ${default_compile_commands} CACHE
-    BOOL "Export compile_commands.json file."
-    FORCE
-  )
-endif()
+# Export compile_commands.json file.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
