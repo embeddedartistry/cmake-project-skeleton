@@ -32,10 +32,6 @@ include(cmake/Conversions.cmake)
 include(cmake/analysis/coverage.cmake)
 # Enable code sanitizer build support
 include(cmake/analysis/sanitizers.cmake)
-# Specifies default compiler flags for the project
-include(cmake/compiler/DefaultCompilerSettings.cmake)
-# Specifies default linker flags for the project
-include(cmake/linker/DefaultLinkerSettings.cmake)
 
 # Enable CMocka support if testing is enabled
 if(PROJECTVARNAME_TESTING_IS_ENABLED)
@@ -46,6 +42,11 @@ endif()
 if(PROJECTVARNAME_TESTING_IS_ENABLED)
   include(cmake/test/catch2.cmake)
 endif()
+
+# Specifies default compiler flags for the project
+include(cmake/compiler/DefaultCompilerSettings.cmake)
+# Specifies default linker flags for the project
+include(cmake/linker/DefaultLinkerSettings.cmake)
 
 # Define Packaging Rules
 include(Packaging.cmake)
