@@ -4,30 +4,45 @@ USE_GIT=1
 USE_SUBMODULES=1
 USE_ADR=0
 USE_POTTERY=0
+COPY_LICENSE=0
+REPLACE_NAME=
 CORE_FILES="docs src test tools .clang-format .clang-tidy BuildOptions.cmake CMakeLists.txt Makefile Packaging.cmake README.md"
 GIT_FILES=".gitattributes .github .gitignore"
 SUBMODULE_DIRS=("cmake")
 SUBMODULE_URLS=("https://github.com/embeddedartistry/cmake-buildsystem.git")
 
+# Detect sed -i command b/c OS X uses BSD sed
+if [ "$(uname)" == "Darwin" ]; then
+	SED="sed -i ''"
+else
+	SED="sed -i"
+fi
+
 # Parse optional arguments
-while getopts apghs opt; do
+while getopts aplghsr: opt; do
   case $opt in
   	a) USE_ADR=1
 	;;
 	p) USE_POTTERY=1
+	;;
+	l) COPY_LICENSE=1
 	;;
 	g) USE_GIT=0
 	   USE_SUBMODULES=0
 	;;
 	s) USE_SUBMODULES=0
 	;;
+	r) REPLACE_NAME="$OPTARG"
+	;;
 	h) # Help
 		echo "Usage: deploy_skeleton.sh [optional ags] dest_dir"
 		echo "Optional args:"
 		echo "	-a: initialize destination to use adr-tools"
 		echo "	-p: initialize destination to use pottery"
+		echo "	-l: copy the license file"
 		echo "	-g: Assume non-git environment. Installs submodule files directly."
 		echo "	-s: Don't use submodules, and copy files directly"
+		echo "	-r <name>: Replace template project/app name values with specified name"
 		exit 0
 	;;
     \?) echo "Invalid option -$OPTARG" >&2
@@ -80,6 +95,10 @@ if [ $USE_SUBMODULES == 0 ]; then
 	cp -r ${SUBMODULE_DIRS[@]} $DEST_DIR
 fi
 
+if [ $COPY_LICENSE == 1 ]; then
+	cp LICENSE $DEST_DIR
+fi
+
 ## The following operations all take place in the destination directory
 cd $DEST_DIR
 
@@ -98,6 +117,23 @@ fi
 if [ $USE_GIT == 1 ]; then
 	git add --all
 	git commit -m "Initial commit of project skeleton files."
+fi
+
+# Replace placeholder names
+if [ ! -z $REPLACE_NAME ]; then
+	# Convert spaces to underscores before replacing names
+	REPLACE_NAME=${REPLACE_NAME// /_}
+	eval $SED "s/MYPROJECT/$REPLACE_NAME/g" "CMakeLists.txt"
+	eval $SED "s/MYPROJECT/$REPLACE_NAME/g" "test/CMakeLists.txt"
+	# Convert to all upper case for variable name
+	# We use awk beacuse it properly handles UTF-8/multibyte input
+	REPLACE_NAME=$(echo "$REPLACE_NAME" | awk '{print toupper($0)}')
+	eval $SED "s/PROJECTVARNAME/$REPLACE_NAME/g" "CMakeLists.txt"
+	eval $SED "s/PROJECTVARNAME/$REPLACE_NAME/g" "test/CMakeLists.txt"
+	eval $SED "s/PROJECTVARNAME/$REPLACE_NAME/g" "BuildOptions.cmake"
+	if [ $USE_GIT == 1 ]; then
+		git commit -am "Replace placeholder values in build files with $REPLACE_NAME."
+	fi
 fi
 
 # Initialize adr-tools
@@ -122,4 +158,13 @@ fi
 # Push all changes to the server
 if [ $USE_GIT == 1 ]; then
 	git push || echo "WARNING: git push failed: check repository."
+fi
+
+if [[ $COPY_LICENSE == 0 && ! -f "LICENSE" || ! -f "LICENSE.md" ]]; then
+	echo "NOTE: Your project does not have a LICENSE or LICENSE.md file in the project root."
+fi
+
+if [[ -z $REPLACE_NAME ]]; then
+	echo "NOTE: Replace the placeholder project name values in CMakeLists.txt and test/CMakeLists.txt (MYPROJECT)"
+	echo "NOTE: Replace the placeholder project variable values in CMakeLists.txt, test/CMakeLists.txt, and BuildOptions.cmake (PROJECTVARNAME)"
 fi
