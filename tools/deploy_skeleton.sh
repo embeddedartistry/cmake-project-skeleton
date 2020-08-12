@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ax
+
 USE_GIT=1
 USE_SUBMODULES=1
 CORE_FILES="docs src test tools .clang-format .clang-tidy BuildOptions.cmake CMakeLists.txt Makefile Packaging.cmake README.md"
@@ -58,11 +60,16 @@ fi
 cp -r $CORE_FILES $DEST_DIR
 
 # Copy git files to the destination
-cp -r $GIT_FILES $DEST_DIR
+if [ $USE_GIT == 1 ]; then
+	cp -r $GIT_FILES $DEST_DIR
+fi
 
 if [ $USE_SUBMODULES == 0 ]; then
-	git submodule update --init
+	git submodule update --init --recursive
 	cp -r $SUBMODULE_DIRS $DEST_DIR
+	cd $DEST_DIR
+	find $SUBMODULE_DIRS -name ".git*" -exec rm -rf {} \;
+	cd -
 fi
 
 # Delete the deploy skeleton script from the destination
