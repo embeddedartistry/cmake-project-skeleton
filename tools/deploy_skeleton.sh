@@ -120,7 +120,7 @@ if [ $USE_GIT == 1 ]; then
 fi
 
 # Replace placeholder names
-if [ ! -z $REPLACE_NAME ]; then
+if [[ ! -z $REPLACE_NAME ]]; then
 	# Convert spaces to underscores before replacing names
 	REPLACE_NAME=${REPLACE_NAME// /_}
 	eval $SED "s/MYPROJECT/$REPLACE_NAME/g" "CMakeLists.txt"
