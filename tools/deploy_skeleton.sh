@@ -82,7 +82,7 @@ fi
 cp -r $CORE_FILES $DEST_DIR
 
 # Delete the deploy skeleton script from the destination
-rm $DEST_DIR/tools/deploy_skeleton.sh
+rm $DEST_DIR/tools/deploy_skeleton.sh $DEST_DIR/tools/download_and_deploy.sh
 
 # Copy git files to the destination
 if [ $USE_GIT == 1 ]; then
