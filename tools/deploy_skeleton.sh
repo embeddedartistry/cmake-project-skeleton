@@ -2,24 +2,32 @@
 
 USE_GIT=1
 USE_SUBMODULES=1
+USE_ADR=0
+USE_POTTERY=0
 CORE_FILES="docs src test tools .clang-format .clang-tidy BuildOptions.cmake CMakeLists.txt Makefile Packaging.cmake README.md"
 GIT_FILES=".gitattributes .github .gitignore"
 SUBMODULE_DIRS=("cmake")
 SUBMODULE_URLS=("https://github.com/embeddedartistry/cmake-buildsystem.git")
 
 # Parse optional arguments
-while getopts gsh opt; do
+while getopts apghs opt; do
   case $opt in
+  	a) USE_ADR=1
+	;;
+	p) USE_POTTERY=1
+	;;
 	g) USE_GIT=0
 	   USE_SUBMODULES=0
 	;;
 	s) USE_SUBMODULES=0
 	;;
 	h) # Help
-		echo "Usage: deploy_skeleton.sh [optio nal ags] dest_dir"
+		echo "Usage: deploy_skeleton.sh [optional ags] dest_dir"
 		echo "Optional args:"
-		echo "	-g: Assume non-git environment and install submodule files directly."
-		echo "	-s: Don't use SUBMODULE_DIRS, and copy files directly"
+		echo "	-a: initialize destination to use adr-tools"
+		echo "	-p: initialize destination to use pottery"
+		echo "	-g: Assume non-git environment. Installs submodule files directly."
+		echo "	-s: Don't use submodules, and copy files directly"
 		exit 0
 	;;
     \?) echo "Invalid option -$OPTARG" >&2
@@ -90,6 +98,25 @@ fi
 if [ $USE_GIT == 1 ]; then
 	git add --all
 	git commit -m "Initial commit of project skeleton files."
+fi
+
+# Initialize adr-tools
+if [ $USE_ADR == 1 ]; then
+	adr init docs/
+	if [ $USE_GIT == 1 ]; then
+		git add --all
+		git commit -m "Initialize adr-tools."
+	fi
+fi
+
+# Initialize pottery
+if [ $USE_POTTERY == 1 ]; then
+	pottery init
+	pottery note "Initial creation of project repository"
+	if [ $USE_GIT == 1 ]; then
+		git add --all
+		git commit -m "Initialize pottery and document repository creation."
+	fi
 fi
 
 # Push all changes to the server
