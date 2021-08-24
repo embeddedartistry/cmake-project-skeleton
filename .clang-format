@@ -1,5 +1,8 @@
 ---
+# Updated for clang-format 12.0.1, some commented values are there
+# for when we update to clang-format 13
 Language:        Cpp
+Standard: Latest #Cpp20
 # BasedOnStyle:  LLVM
 # The extra indent or outdent of access modifiers (e.g., public)
 AccessModifierOffset: -2
@@ -138,7 +141,7 @@ DerivePointerAlignment: false
 # Do not completely disable formatting
 DisableFormat:   false
 # Remove all empty lines after access modifiers
-EmptyLineAfterAccessModifier: Never
+#EmptyLineAfterAccessModifier: Never
 #  Add empty line only when access modifier starts a new logical block.
 # Logical block is a group of one or more member fields or functions.
 EmptyLineBeforeAccessModifier: LogicalBlock
@@ -171,7 +174,7 @@ IncludeIsMainRegex: '$'
 IncludeIsMainSourceRegex: ''
 # access modifiers are indented (or outdented) relative to the record members,
 # respecting the AccessModifierOffset
-IndentAccessModifiers: false
+#IndentAccessModifiers: false
 # Do not indent case blocks one level from case label
 IndentCaseBlocks: false
 # Do indent case labels within a switch block
@@ -191,7 +194,7 @@ IndentWrappedFunctionNames: true
 # Remove empty lines at the start of a block
 KeepEmptyLinesAtTheStartOfBlocks: false
 # Align lambda body relative to the start of the lambda signature
-LambdaBodyIndentation: Signature
+#LambdaBodyIndentation: Signature
 # A regular expression matching macros that start a block.
 MacroBlockBegin: ''
 # A regular expression matching macros that end a block.
@@ -201,7 +204,7 @@ MaxEmptyLinesToKeep: 1
 # Don’t indent namespaces
 NamespaceIndentation: None
 # A vector of macros which are used to open namespace blocks
-NamespaceMacros: ''
+#NamespaceMacros: ''
 PenaltyBreakAssignment: 2
 PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyBreakComment: 300
@@ -213,13 +216,13 @@ PenaltyReturnTypeOnItsOwnLine: 60
 # align pointers: int* ptr
 PointerAlignment: Left
 # align references like pointers
-ReferenceAlignment: Pointer
+#ReferenceAlignment: Pointer
 # Clang-format will attempt to reflow long comments
 ReflowComments:  true
 # Always have an ending namespace commment
-ShortNamespaceLines: 0
+#ShortNamespaceLines: 0
 # Include sorting is alphabetical and case insensitive
-SortIncludes:    CaseInsensitive
+SortIncludes: false   #CaseInsensitive
 # using declarations will be  alphabetically sorted
 SortUsingDeclarations: true
 # Do not insert a space after a C-style cast
@@ -253,7 +256,7 @@ SpaceInEmptyParentheses: false
 # Spaces between end of the code and the start of a // line comment
 SpacesBeforeTrailingComments: 1
 # Remove spaces within <> : <int>
-SpacesInAngles:  Never
+SpacesInAngles:  false #Never
 # Do not add spaces in C-style cast parens
 SpacesInCStyleCastParentheses: false
 # Do not add spaces around if/for/while/switch conditions
@@ -264,15 +267,14 @@ SpacesInContainerLiterals: false
 SpacesInParentheses: false
 # Do not insert spaces after [ and before ]
 SpacesInSquareBrackets: false
-Standard:        Cpp20
 # Macros which are ignored in front of a statement, as if they were an attribute.
-StatementAttributeLikeMacros: ''
+# StatementAttributeLikeMacros:
 # A vector of macros that should be interpreted as complete statements.
-StatementMacros: ''
+# StatementMacros: ''
 # The number of columns used for tab stops.
 TabWidth:        4
 # A vector of macros that should be interpreted as type declarations instead of as function calls.
-TypenameMacros: ''
+#TypenameMacros: ''
 # use \n for line breaks
 UseCRLF: false
 # Use tabs whenever we need to fill whitespace that spans at least from one tab stop to the next one.
